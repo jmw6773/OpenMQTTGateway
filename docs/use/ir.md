@@ -121,3 +121,8 @@ So as to repeat the IR signal received by the gateway once set the following par
 ## Raw IR signal forwarding
 So as to repeat the raw IR signal received by the gateway, uncomment and set the following parameter to true in [config_IR.h](https://github.com/1technophile/OpenMQTTGateway/blob/091b317660fd201a30e2cd0e15424a13c5a6bd71/config_IR.h#L39)
 `#define RawDirectForward true`
+
+## Disabling IR Receive
+If you will only be transmitting IR data, you can disable IR receiving functions. This will make the PIN assigned for receiving available for other functions. Disabling IR receive also reduces RAM and Flash usage.
+To disable IR Receiving, uncomment the following line in the `config_IR.h` file.
+`#define DISABLE_IR_RECEIVE`

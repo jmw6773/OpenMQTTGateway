@@ -50,6 +50,8 @@ extern void MQTTtoIR(char* topicOri, JsonObject& RFdata);
 #define pubIRunknownPrtcl false // key to avoid mqtt publication of unknown IR protocol (set to true if you want to publish unknown protocol)
 #define PanasonicAddress  0x4004 // Panasonic address (Pre data)
 
+//#define DISABLE_IR_RECEIVE // Uncomment to disable receiving functions of IR Gateway
+
 #if defined(ESP8266) || defined(ESP32) //IR supported protocols on ESP8266, all supported per default
 #  define IR_GC
 #  define IR_RAW

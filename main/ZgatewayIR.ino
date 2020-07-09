@@ -29,20 +29,29 @@
 
 #ifdef ZgatewayIR
 
+# ifndef DISABLE_IR_RECEIVE
 #  if defined(ESP8266) || defined(ESP32)
 #    include <IRrecv.h> // Needed if you want to receive IR commands.
 #    include <IRremoteESP8266.h>
-#    include <IRsend.h> // Needed if you want to send IR commands.
 #    include <IRutils.h>
 #    ifdef DumpMode // in dump mode we increase the size of the buffer to catch big codes
 IRrecv irrecv(IR_RECEIVER_GPIO, 1024, 15U, true);
 #    else
 IRrecv irrecv(IR_RECEIVER_GPIO);
 #    endif
-IRsend irsend(IR_EMITTER_GPIO, IR_EMITTER_INVERTED);
 #  else
 #    include <IRremote.h>
 IRrecv irrecv(IR_RECEIVER_GPIO);
+#  endif
+# endif
+
+#  if defined(ESP8266) || defined(ESP32)
+#    include <IRremoteESP8266.h>
+#    include <IRsend.h> // Needed if you want to send IR commands.
+#    include <IRutils.h>
+IRsend irsend(IR_EMITTER_GPIO, IR_EMITTER_INVERTED);
+#  else
+#    include <IRremote.h>
 IRsend irsend; //connect IR emitter pin to D9 on arduino, you need to comment #define IR_USE_TIMER2 and uncomment #define IR_USE_TIMER1 on library IRremote.h so as to free pin D3 for RF RECEIVER PIN
 #  endif
 
@@ -103,7 +112,9 @@ void setupIR() {
   irsend.begin();
 #  endif
 
+# ifndef DISABLE_IR_RECEIVE
   irrecv.enableIRIn(); // Start the receiver
+# endif
 
   Log.notice(F("IR_EMITTER_GPIO: %d " CR), IR_EMITTER_GPIO);
   Log.notice(F("IR_RECEIVER_GPIO: %d " CR), IR_RECEIVER_GPIO);
@@ -111,6 +122,7 @@ void setupIR() {
 }
 
 void IRtoMQTT() {
+# ifndef DISABLE_IR_RECEIVE
   decode_results results;
 
   if (irrecv.decode(&results)) {
@@ -177,6 +189,7 @@ void IRtoMQTT() {
       }
     }
   }
+# endif
 }
 
 #  ifdef jsonReceiving
@@ -273,7 +286,9 @@ void MQTTtoIR(char* topicOri, JsonObject& IRdata) {
         Log.notice(F("MQTTtoIR OK" CR));
         pub(subjectGTWIRtoMQTT, IRdata);
       }
+#     ifndef DISABLE_IR_RECEIVE
       irrecv.enableIRIn(); // ReStart the IR receiver (if not restarted it is not able to receive data)
+#     endif
     } else {
       Log.error(F("MQTTtoIR failed json read" CR));
     }
