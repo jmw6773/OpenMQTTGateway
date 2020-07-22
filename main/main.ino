@@ -133,6 +133,13 @@ unsigned long timer_sys_measures = 0;
 //adding this to bypass the problem of the arduino builder issue 50
 void callback(char* topic, byte* payload, unsigned int length);
 
+char mqtt_user[parameters_size] = MQTT_USER; // not compulsory only if your broker needs authentication
+char mqtt_pass[parameters_size] = MQTT_PASS; // not compulsory only if your broker needs authentication
+char mqtt_server[parameters_size] = MQTT_SERVER;
+char mqtt_port[6] = MQTT_PORT;
+char mqtt_topic[mqtt_topic_max_size] = Base_Topic;
+char gateway_name[parameters_size * 2] = Gateway_Name;
+
 bool connectedOnce = false; //indicate if we have been connected once to MQTT
 int failure_number_ntwk = 0; // number of failure connecting to network
 int failure_number_mqtt = 0; // number of failure connecting to MQTT
@@ -761,12 +768,16 @@ void setOTA() {
 
 #if defined(ESPWifiManualSetup)
 void setup_wifi() {
+
+  char manual_wifi_ssid[] = wifi_ssid;
+  char manual_wifi_password[] = wifi_password;
+
   delay(10);
   WiFi.mode(WIFI_STA);
   if (wifiProtocol) forceWifiProtocol();
 
   // We start by connecting to a WiFi network
-  Log.trace(F("Connecting to %s" CR), wifi_ssid);
+  Log.trace(F("Connecting to %s" CR), manual_wifi_ssid);
 #  ifdef ESPWifiAdvancedSetup
   IPAddress ip_adress(ip);
   IPAddress gateway_adress(gateway);
@@ -775,9 +786,9 @@ void setup_wifi() {
   if (!WiFi.config(ip_adress, gateway_adress, subnet_adress, dns_adress)) {
     Log.error(F("Wifi STA Failed to configure" CR));
   }
-  WiFi.begin(wifi_ssid, wifi_password);
+  WiFi.begin(manual_wifi_ssid, manual_wifi_password);
 #  else
-  WiFi.begin(wifi_ssid, wifi_password);
+  WiFi.begin(manual_wifi_ssid, manual_wifi_password);
 #  endif
 
   if (wifi_reconnect_bypass())
